@@ -13,11 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Set date variable
+        id: set-date
+        run: echo "::set-output name=date::$(date +%s)"
+
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag front-end:$(date +%s)
+        run: docker build . --file Dockerfile --tag front-end:${{ steps.set-date.outputs.date }}
 
       - name: Tag Docker image
-        run: docker tag front-end:$(date +%s) obiasnara/nuitinfo2023:latest
+        run: docker tag front-end:${{ steps.set-date.outputs.date }} obiasnara/nuitinfo2023:latest
 
       - name: Log in to Docker Hub
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
