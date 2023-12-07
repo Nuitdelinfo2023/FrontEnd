@@ -16,7 +16,7 @@ function App() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          React pour la NUIT DE L'INFO 2023 - 2024 
         </a>
       </header>
     </div>
