@@ -17,68 +17,140 @@ const { Header, Content, Footer, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const buttonClicked = [] as any;
+const Cards: React.FC = () => {
+  const [selectedCards, setSelectedCards] = useState<string[]>([]);
 
-const cardClicked = (id:any) => {
-  buttonClicked.push(id);
-  console.log(buttonClicked);
-  
-  {alert('Ajouter')};
+  const addCard = (id: string) => {
+    setSelectedCards((prevSelectedCards) => [...prevSelectedCards, id]);
+  };
+
+  const removeCard = (id: string) => {
+    setSelectedCards((prevSelectedCards) =>
+      prevSelectedCards.filter((cardId) => cardId !== id)
+    );
+  };
+
+  const cardClicked = (event: React.MouseEvent<HTMLElement>) => {
+    const id = event.currentTarget.id;
+    const currentColor = event.currentTarget.style.backgroundColor;
+    if (currentColor === 'red') {
+      event.currentTarget.style.backgroundColor = 'white';
+      removeCard(id);
+    } else {
+      event.currentTarget.style.backgroundColor = 'red';
+      addCard(id);
+    }
+  };
+
+  return (
+    <div>
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card
+            title="Ecologie"
+            bordered={false}
+            id="1"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('1') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="Pollution"
+            bordered={false}
+            id="2"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('2') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="Le cacaaa"
+            bordered={false}
+            id="3"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('3') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+      </Row>
+
+      <div style={{ margin: '20px' }}></div>
+
+      <Row gutter={16}>
+        <Col span={8}>
+          <Card
+            title="Nouvelle carte 1"
+            bordered={false}
+            id="4"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('4') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+    
+        <Col span={8}>
+          <Card
+            title="Nouvelle carte 2"
+            bordered={false}
+            id="5"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('5') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+        <Col span={8}>
+          <Card
+            title="Nouvelle carte 3"
+            bordered={false}
+            id="6"
+            onClick={cardClicked}
+            style={{
+              backgroundColor: selectedCards.includes('6') ? 'red' : 'white',
+            }}
+          >
+            Card content
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
 };
 
-const Cards: React.FC = () => (
-  <div>
-    <Row gutter={16}>
-      <Col span={8}>
-        <Card title="Ecologie" bordered={false} id='1' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Pollution" bordered={false} id='2' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Le cacaaa" bordered={false} id='3' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-    </Row>
-    
-    <div style={{ margin: '20px' }}></div>
+function Trash({ selectedCards, check }: { selectedCards: string[], check: () => void }) {
+  const handleTrashClick = () => {
+    check();
+    alert('Vous avez cliqué sur la poubelle');
+  };
 
-    <Row gutter={16}>
-      <Col span={8}>
-        <Card title="Nouvelle carte 1" bordered={false} id='4' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Nouvelle carte 2" bordered={false} id='5' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-      <Col span={8}>
-        <Card title="Nouvelle carte 3" bordered={false} id='6' onClick={cardClicked}>
-          Card content
-        </Card>
-      </Col>
-    </Row>
-  </div>
-);
-
-function Trash () {
   return (
     <Image
-    height={300}
-    width={200}
-    preview={false}
-    src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Trash_can1.svg/640px-Trash_can1.svg.png"
-    onClick={() => {alert('Vous avez cliqué sur la poubelle')}}
+      height={300}
+      width={200}
+      preview={false}
+      src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Trash_can1.svg/640px-Trash_can1.svg.png"
+      onClick={handleTrashClick}
     />
   );
 }
+
 function GoodBac () {
   return (
     <Image
@@ -166,6 +238,22 @@ const App: React.FC = () => {
       duration: 5,
     });
   };
+
+  const [selectedCards, setSelectedCards] = useState<any[]>([]);
+  
+  const check = () => {
+    // Get the selected cards
+    console.log(selectedCards);
+
+    // Remove the selected cards from the state
+      const selectedCardElements = document.querySelectorAll('.selected-card');
+      selectedCardElements.forEach((cardElement) => {
+      cardElement.classList.remove('selected-card');
+      cardElement.parentNode?.removeChild(cardElement);
+    });
+  };
+
+  
   
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -207,7 +295,7 @@ const App: React.FC = () => {
         </Content>
         <Footer >
             <GoodBac />
-            <Trash />
+            <Trash selectedCards={[]} check={check} />
         </Footer>
       </Layout>
     </Layout>
