@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: registry.digitalocean.com/nuitinforegistery/front-end
+        image: front-end
         ports:
         - containerPort: 80
         
