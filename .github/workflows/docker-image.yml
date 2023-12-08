@@ -9,22 +9,30 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout master
+      uses: actions/checkout@main
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+    - name: Build container image
+      run: docker build -t registry.digitalocean.com/nuitinforegistery/front-end:$(echo $GITHUB_SHA | head -c7) .
+    
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+  
+    - name: Push image to DigitalOcean Container Registry
+      run: docker push registry.digitalocean.com/nuitinforegistery/front-end:$(echo $GITHUB_SHA | head -c7)
 
-      - name: Set date variable
-        id: set-date
-        run: echo "::set-output name=date::$(date +%s)"
+    - name: Update deployment file
+      run: TAG=$(echo $GITHUB_SHA | head -c7) && sed -i 's|<IMAGE>|registry.digitalocean.com/nuitinforegistery/front-end:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
+    
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 nuitinfocluster
 
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag front-end:${{ steps.set-date.outputs.date }}
+    - name: Deploy to DigitalOcean Kubernetes
+      run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-      - name: Tag Docker image
-        run: docker tag front-end:${{ steps.set-date.outputs.date }} obiasnara/nuitinfo2023:latest
-
-      - name: Log in to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Push Docker image to Docker Hub
-        run: docker push obiasnara/nuitinfo2023:latest
+    - name: Verify deployment
+      run: kubectl rollout status deployment/nginx-deployment
